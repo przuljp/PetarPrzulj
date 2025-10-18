@@ -1,1 +1,1 @@
-# WebProgramming---Barbershop
+The Barbershop App is a modern platform designed to simplify booking and managing barber appointments. Users can browse available barbers, view their services and prices, and schedule appointments in just a few taps. Barbers can manage their schedules, track clients, and receive notifications for upcoming bookings. The app enhances convenience, reduces waiting times, and improves communication between barbers and customers.
