@@ -20,5 +20,12 @@ class ReviewDao extends BaseDao {
         $stmt->execute();
         return $stmt->fetch();
     }
+
+    public function getReviewByBarberId($barberId) {
+    $stmt = $this->connection->prepare("SELECT * FROM reviews WHERE barber_id = :barber_id");
+    $stmt->bindParam(':barber_id', $barberId);
+    $stmt->execute();
+    return $stmt->fetchAll();
+}
 }
 ?>
