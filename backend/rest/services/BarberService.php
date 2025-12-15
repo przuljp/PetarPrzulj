@@ -7,7 +7,7 @@ class BarberService extends BaseService {
         parent::__construct(new BarberDao());
     }
 
-    public function get_by_name($name) {
+    public function getByName($name) {
         return $this->dao->getByName($name);
     }
 }

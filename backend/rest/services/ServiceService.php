@@ -7,7 +7,7 @@ class ServiceService extends BaseService {
         parent::__construct(new ServiceDao());
     }
 
-    public function get_by_name($name) {
+    public function getByName($name) {
         return $this->dao->getByName($name);
     }
 }

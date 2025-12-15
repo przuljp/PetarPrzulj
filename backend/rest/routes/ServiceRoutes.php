@@ -5,6 +5,7 @@
  *      tags={"services"},
  *      summary="Get service by ID",
  *      description="Retrieve details for a specific service using its ID.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -19,6 +20,9 @@
  * )
  */
 Flight::route('GET /service/@id', function($id){
+    // Admin + User mogu čitati servis
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
     Flight::json(Flight::serviceService()->getById($id));
 });
 
@@ -28,6 +32,7 @@ Flight::route('GET /service/@id', function($id){
  *      tags={"services"},
  *      summary="Get all services or filter by name",
  *      description="Retrieve a list of all services, or filter by name using a query parameter.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="name",
  *          in="query",
@@ -42,9 +47,12 @@ Flight::route('GET /service/@id', function($id){
  * )
  */
 Flight::route('GET /service', function(){
+    // Admin + User mogu gledati listu servisa
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
     $name = Flight::request()->query['name'] ?? null;
     if ($name) {
-        Flight::json(Flight::serviceService()->get_by_name($name));
+        Flight::json(Flight::serviceService()->getByName($name));
     } else {
         Flight::json(Flight::serviceService()->getAll());
     }
@@ -56,6 +64,7 @@ Flight::route('GET /service', function(){
  *      tags={"services"},
  *      summary="Add a new service",
  *      description="Create a new service offered by the barber shop.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\RequestBody(
  *          required=true,
  *          @OA\JsonContent(
@@ -73,8 +82,11 @@ Flight::route('GET /service', function(){
  * )
  */
 Flight::route('POST /service', function(){
+    // Kreiranje servisa – samo admin
+    Flight::auth_middleware()->authorizeRole(Roles::ADMIN);
+
     $data = Flight::request()->data->getData();
-    Flight::json(Flight::serviceService()->create($data));
+    Flight::json(Flight::serviceService()->insert($data));
 });
 
 /**
@@ -83,6 +95,7 @@ Flight::route('POST /service', function(){
  *      tags={"services"},
  *      summary="Update service by ID",
  *      description="Fully update an existing service's information.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -107,6 +120,9 @@ Flight::route('POST /service', function(){
  * )
  */
 Flight::route('PUT /service/@id', function($id){
+    // Update servisa – samo admin
+    Flight::auth_middleware()->authorizeRole(Roles::ADMIN);
+
     $data = Flight::request()->data->getData();
     Flight::json(Flight::serviceService()->update($id, $data));
 });
@@ -117,6 +133,7 @@ Flight::route('PUT /service/@id', function($id){
  *      tags={"services"},
  *      summary="Partially update service by ID",
  *      description="Update selected fields of a service without overwriting all data.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -138,6 +155,9 @@ Flight::route('PUT /service/@id', function($id){
  * )
  */
 Flight::route('PATCH /service/@id', function($id){
+    // Partial update – isto admin
+    Flight::auth_middleware()->authorizeRole(Roles::ADMIN);
+
     $data = Flight::request()->data->getData();
     Flight::json(Flight::serviceService()->update($id, $data));
 });
@@ -148,6 +168,7 @@ Flight::route('PATCH /service/@id', function($id){
  *      tags={"services"},
  *      summary="Delete service by ID",
  *      description="Remove a service from the system using its ID.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -162,5 +183,8 @@ Flight::route('PATCH /service/@id', function($id){
  * )
  */
 Flight::route('DELETE /service/@id', function($id){
+    // Brisanje servisa – samo admin
+    Flight::auth_middleware()->authorizeRole(Roles::ADMIN);
+
     Flight::json(Flight::serviceService()->delete($id));
 });

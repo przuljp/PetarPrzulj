@@ -1,0 +1,44 @@
+<section>
+  <div class="container py-4">
+    <h2>Admin Panel</h2>
+    <p class="text-muted">Administrative functions. Visible only to users with the <strong>admin</strong> role.</p>
+
+    <div class="row">
+      <div class="col-md-4 mb-3 admin-only">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Manage Users</h5>
+            <p class="card-text">Create, edit, or delete users.</p>
+            <a class="btn btn-primary" href="#manage-users">Open</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3 admin-only">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Manage Appointments</h5>
+            <p class="card-text">View and modify appointments.</p>
+            <a class="btn btn-secondary" href="#manage-appointments">Open</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3 admin-only">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Manage Services</h5>
+            <p class="card-text">Add or remove offered services.</p>
+            <a class="btn btn-outline-danger" href="#manage-services">Open</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="admin-content" class="mt-4 admin-only">
+      <p class="text-muted">Admin content will load here.</p>
+    </div>
+
+    <div id="admin-denied" class="alert alert-danger d-none">Access denied. Admins only.</div>
+  </div>
+</section>

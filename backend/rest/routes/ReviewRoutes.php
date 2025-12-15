@@ -5,6 +5,7 @@
  *      tags={"reviews"},
  *      summary="Get review by ID",
  *      description="Fetch a single review using its unique ID.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -19,7 +20,10 @@
  * )
  */
 Flight::route('GET /review/@id', function($id){
-    Flight::json(Flight::reviewService()->get_review_by_id($id));
+    // Admin + User mogu čitati pojedinačan review
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
+    Flight::json(Flight::reviewService()->getReviewById($id));
 });
 
 /**
@@ -28,6 +32,7 @@ Flight::route('GET /review/@id', function($id){
  *      tags={"reviews"},
  *      summary="Get all reviews or filter by user_id/barber_id",
  *      description="Retrieve all reviews, or filter by user_id or barber_id using query parameters.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="user_id",
  *          in="query",
@@ -49,13 +54,16 @@ Flight::route('GET /review/@id', function($id){
  * )
  */
 Flight::route('GET /review', function(){
+    // Pregled liste review-a – admin + user
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
     $user_id = Flight::request()->query['user_id'] ?? null;
     $barber_id = Flight::request()->query['barber_id'] ?? null;
     
     if ($user_id) {
-        Flight::json(Flight::reviewService()->get_review_by_user_id($user_id));
+        Flight::json(Flight::reviewService()->getReviewByUserId($user_id));
     } elseif ($barber_id) {
-        Flight::json(Flight::reviewService()->get_review_by_barber_id($barber_id));
+        Flight::json(Flight::reviewService()->getReviewByBarberId($barber_id));
     } else {
         Flight::json(Flight::reviewService()->getAll());
     }
@@ -67,6 +75,7 @@ Flight::route('GET /review', function(){
  *      tags={"reviews"},
  *      summary="Add a new review",
  *      description="Create a new review for a barber by a user.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\RequestBody(
  *          required=true,
  *          @OA\JsonContent(
@@ -84,8 +93,11 @@ Flight::route('GET /review', function(){
  * )
  */
 Flight::route('POST /review', function(){
+    // Dodavanje review-a – admin + user
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
     $data = Flight::request()->data->getData();
-    Flight::json(Flight::reviewService()->create($data));
+    Flight::json(Flight::reviewService()->insert($data));
 });
 
 /**
@@ -94,6 +106,7 @@ Flight::route('POST /review', function(){
  *      tags={"reviews"},
  *      summary="Update a review by ID",
  *      description="Fully update an existing review with new data.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -118,6 +131,9 @@ Flight::route('POST /review', function(){
  * )
  */
 Flight::route('PUT /review/@id', function($id){
+    // Full update review-a – admin + user
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
     $data = Flight::request()->data->getData();
     Flight::json(Flight::reviewService()->update($id, $data));
 });
@@ -128,6 +144,7 @@ Flight::route('PUT /review/@id', function($id){
  *      tags={"reviews"},
  *      summary="Partially update review by ID",
  *      description="Update one or more fields of a review without overwriting all fields.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -149,6 +166,9 @@ Flight::route('PUT /review/@id', function($id){
  * )
  */
 Flight::route('PATCH /review/@id', function($id){
+    // Partial update – admin + user
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
     $data = Flight::request()->data->getData();
     Flight::json(Flight::reviewService()->update($id, $data));
 });
@@ -159,6 +179,7 @@ Flight::route('PATCH /review/@id', function($id){
  *      tags={"reviews"},
  *      summary="Delete review by ID",
  *      description="Remove a review from the system using its ID.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -173,5 +194,8 @@ Flight::route('PATCH /review/@id', function($id){
  * )
  */
 Flight::route('DELETE /review/@id', function($id){
+    // Brisanje review-a – samo admin
+    Flight::auth_middleware()->authorizeRole(Roles::ADMIN);
+
     Flight::json(Flight::reviewService()->delete($id));
 });
