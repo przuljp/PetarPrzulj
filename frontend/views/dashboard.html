@@ -1,6 +1,20 @@
-<section>
-  <div id="dashboard-root">
-    <!-- Dashboard content rendered by JS based on role -->
-    <h2>Loading dashboard...</h2>
+<div class="container">
+  <h2>Admin Dashboard</h2>
+
+  <div class="alert alert-info">
+    <strong>Welcome, admin!</strong>
   </div>
-</section>
+
+  <ul class="list-group">
+    <li class="list-group-item">
+      <strong>Email:</strong> <span id="admin-email">–</span>
+    </li>
+    <li class="list-group-item">
+      <strong>Role:</strong> <span id="admin-role">–</span>
+    </li>
+  </ul>
+
+  <div class="mt-3">
+    <button id="load-info" class="btn btn-primary">
+      Load admin info
+    </b

@@ -7,11 +7,11 @@ class UserService extends BaseService {
         parent::__construct(new UserDao());
     }
 
-    public function get_by_email($email) {
+    public function getByEmail($email) {
         return $this->dao->getByEmail($email);
     }
 
-    public function get_user_by_id($id) {
+    public function getUserById($id) {
         return $this->dao->getUserByID($id);
     }
 }

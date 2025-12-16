@@ -1,4 +1,10 @@
 RewriteEngine On
+RewriteBase /PetarPrzulj/backend/
+
+# Ako koristiš Flight rute
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [QSA,L]
+
+# NAJBITNIJE ZA JWT:
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1

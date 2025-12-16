@@ -7,15 +7,15 @@ class AppointmentService extends BaseService {
         parent::__construct(new AppointmentDao());
     }
 
-    public function get_appointment_by_id($id) {
-        return $this->dao->getAppointmentByID($id);
+    public function getAppointmentById($id) {
+        return $this->dao->getAppointmentById($id);
     }
 
-    public function get_appointment_by_user_id($user_id) {
+    public function getAppointmentByUserId($user_id) {
         return $this->dao->getAppointmentByUserId($user_id);
     }
 
-    public function get_appointment_by_barber_id($barber_id) {
+    public function getAppointmentByBarberId($barber_id) {
         return $this->dao->getAppointmentByBarberId($barber_id);
     }
 }

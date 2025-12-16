@@ -5,6 +5,7 @@
  *      tags={"appointments"},
  *      summary="Get appointment by ID",
  *      description="Returns a specific appointment based on its ID",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -19,7 +20,10 @@
  * )
  */
 Flight::route('GET /appointment/@id', function($id){
-    Flight::json(Flight::appointmentService()->get_appointment_by_id($id));
+    // Admin + User smiju vidjeti termin
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
+    Flight::json(Flight::appointmentService()->getAppointmentById($id));
 });
 
 /**
@@ -28,6 +32,7 @@ Flight::route('GET /appointment/@id', function($id){
  *      tags={"appointments"},
  *      summary="Get all appointments or filter by user_id/barber_id",
  *      description="Fetch all appointments, or filter by user_id or barber_id using query parameters.",
+ *     security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="user_id",
  *          in="query",
@@ -49,13 +54,16 @@ Flight::route('GET /appointment/@id', function($id){
  * )
  */
 Flight::route('GET /appointment', function(){
+    // Admin + User vide sve termine ili filtrirane
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
     $user_id = Flight::request()->query['user_id'] ?? null;
     $barber_id = Flight::request()->query['barber_id'] ?? null;
     
     if ($user_id) {
-        Flight::json(Flight::appointmentService()->get_appointment_by_user_id($user_id));
+        Flight::json(Flight::appointmentService()->getAppointmentByUserId($user_id));
     } elseif ($barber_id) {
-        Flight::json(Flight::appointmentService()->get_appointment_by_barber_id($barber_id));
+        Flight::json(Flight::appointmentService()->getAppointmentByBarberId($barber_id));
     } else {
         Flight::json(Flight::appointmentService()->getAll());
     }
@@ -67,6 +75,7 @@ Flight::route('GET /appointment', function(){
  *      tags={"appointments"},
  *      summary="Create a new appointment",
  *      description="Add a new appointment to the database.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\RequestBody(
  *          required=true,
  *          @OA\JsonContent(
@@ -84,8 +93,11 @@ Flight::route('GET /appointment', function(){
  * )
  */
 Flight::route('POST /appointment', function(){
+    // Kreiranje termina – admin + user
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
     $data = Flight::request()->data->getData();
-    Flight::json(Flight::appointmentService()->create($data));
+    Flight::json(Flight::appointmentService()->insert($data));
 });
 
 /**
@@ -94,6 +106,7 @@ Flight::route('POST /appointment', function(){
  *      tags={"appointments"},
  *      summary="Update an existing appointment by ID",
  *      description="Replace all fields of an existing appointment with new values.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -118,6 +131,9 @@ Flight::route('POST /appointment', function(){
  * )
  */
 Flight::route('PUT /appointment/@id', function($id){
+    // Full update – admin + user
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
     $data = Flight::request()->data->getData();
     Flight::json(Flight::appointmentService()->update($id, $data));
 });
@@ -128,6 +144,7 @@ Flight::route('PUT /appointment/@id', function($id){
  *      tags={"appointments"},
  *      summary="Partially update appointment by ID",
  *      description="Update only specific fields of an existing appointment.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -149,6 +166,9 @@ Flight::route('PUT /appointment/@id', function($id){
  * )
  */
 Flight::route('PATCH /appointment/@id', function($id){
+    // Partial update – admin + user
+    Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
+
     $data = Flight::request()->data->getData();
     Flight::json(Flight::appointmentService()->update($id, $data));
 });
@@ -159,6 +179,7 @@ Flight::route('PATCH /appointment/@id', function($id){
  *      tags={"appointments"},
  *      summary="Delete appointment by ID",
  *      description="Remove an appointment record from the database.",
+ *      security={{"BearerAuth":{}}},
  *      @OA\Parameter(
  *          name="id",
  *          in="path",
@@ -173,5 +194,8 @@ Flight::route('PATCH /appointment/@id', function($id){
  * )
  */
 Flight::route('DELETE /appointment/@id', function($id){
+    // Brisanje termina – SAMO admin
+    Flight::auth_middleware()->authorizeRole(Roles::ADMIN);
+
     Flight::json(Flight::appointmentService()->delete($id));
 });

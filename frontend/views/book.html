@@ -1,31 +1,40 @@
-<section>
-  <h2>Book an Appointment</h2>
-  <p class="text-muted">Fill out the form to request a booking. (Demo - no backend)</p>
-  <div class="card p-4 form-card">
-    <form id="bookingForm">
-      <div class="mb-3">
-        <label class="form-label">Full name</label>
-        <input class="form-control" name="name" required>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Service</label>
-        <select name="service" class="form-select">
-          <option>Classic Cut</option>
-          <option>Fade</option>
-          <option>Beard Trim</option>
-        </select>
-      </div>
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Date</label>
-          <input class="form-control" type="date" name="date" required>
-        </div>
-        <div class="col-md-6 mb-3">
-          <label class="form-label">Time</label>
-          <input class="form-control" type="time" name="time" required>
-        </div>
-      </div>
-      <button class="btn btn-primary">Request Booking</button>
-    </form>
-  </div>
-</section>
+<div class="container py-4">
+  <h2 class="mb-4">Book an Appointment</h2>
+
+  <form id="book-appointment-form" class="card p-4 shadow-sm">
+
+    <!-- Barber -->
+    <div class="mb-3">
+      <label class="form-label">Choose Barber</label>
+      <select id="barber-select" name="barber_id" class="form-select" required>
+        <option value="">Loading barbers...</option>
+      </select>
+    </div>
+
+    <!-- Service -->
+    <div class="mb-3">
+      <label class="form-label">Choose Service</label>
+      <select id="service-select" name="service_id" class="form-select" required>
+        <option value="">Choose service</option>
+        <option value="1">Haircut</option>
+        <option value="2">Beard Trim</option>
+        <option value="3">Shave</option>
+      </select>
+    </div>
+
+    <!-- Date & Time -->
+    <div class="mb-3">
+      <label class="form-label">Appointment Date & Time</label>
+      <input
+        type="datetime-local"
+        name="appointment_date"
+        class="form-control"
+        required
+      >
+    </div>
+
+    <button type="submit" class="btn btn-dark w-100">
+      Book Appointment
+    </button>
+  </form>
+</div>
