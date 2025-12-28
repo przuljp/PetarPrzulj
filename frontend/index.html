@@ -5,27 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>BarberShop</title>
 
+    <!-- BOOTSTRAP CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CUSTOM CSS -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/spapp.css">
 </head>
 
 <body>
 
-<!-- NAVBAR -->
+<!-- =========================
+     NAVBAR
+========================= -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="#home">BarberShop</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
+
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav ms-auto" id="tabs"></ul>
         </div>
     </div>
 </nav>
 
-<!-- ✅ HTML-BASED SPApp (KAO NA POČETKU) -->
+<!-- =========================
+     MAIN (SPAPP)
+========================= -->
 <main id="spapp" role="main" class="container mt-4">
 
     <section id="home" data-load="home.html"></section>
@@ -40,36 +48,53 @@
     <section id="manage-barbers" data-load="manage-barbers.html"></section>
     <section id="manage-appointments" data-load="manage-appointments.html"></section>
 
-
-
 </main>
 
+<!-- =========================
+     FOOTER
+========================= -->
 <footer class="bg-dark text-white text-center py-3 mt-5">
     <div class="container">
         &copy; <span id="year"></span> BarberShop
     </div>
 </footer>
 
-<!-- CORE -->
+<!-- =========================
+     CORE LIBRARIES
+========================= -->
 <script src="js/jquery.min.js"></script>
+
+<!-- jQuery Validation (OBAVEZNO) -->
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+
+<!-- jQuery BlockUI (koristiš u UserService) -->
+<script src="https://malsup.github.io/jquery.blockUI.js"></script>
+
+<!-- SPApp -->
 <script src="js/jquery.spapp.min.js"></script>
+
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- UTILS -->
+<!-- =========================
+     UTILS
+========================= -->
 <script src="utils/constants.js"></script>
 <script src="utils/rest-client.js"></script>
 <script src="utils/utils.js"></script>
 
-<!-- SERVICES (SAMO OVI) -->
+<!-- =========================
+     SERVICES (FRONTEND MVC)
+========================= -->
 <script src="services/user-service.js"></script>
 <script src="services/dashboard-service.js"></script>
 <script src="services/barber-service.js"></script>
 <script src="services/appointment-service.js"></script>
 <script src="services/review-service.js"></script>
 
-
-
-<!-- APP INIT -->
+<!-- =========================
+     APP INIT
+========================= -->
 <script src="js/app.js"></script>
 <script src="js/script.js"></script>
 
