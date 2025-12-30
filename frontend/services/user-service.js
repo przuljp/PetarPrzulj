@@ -1,76 +1,113 @@
-// js/services/user-service.js
+// frontend/services/user-service.js
 var UserService = {
 
     init: function () {
-        // Login forma (delegirano - radi i kad se view dinamički učita)
-        $(document).on("submit", "#loginForm", function (e) {
-            e.preventDefault();
-            const entity = Object.fromEntries(new FormData(this).entries());
-            UserService.login(entity);
-        });
 
-        // Register forma
-        $(document).on("submit", "#registerForm", function (e) {
-            e.preventDefault();
-            const entity = Object.fromEntries(new FormData(this).entries());
-            UserService.register(entity);
-        });
-
-        // Logout dugme (stavićemo id="logoutBtn" u navbaru dinamički)
+        /* LOGOUT */
+        $(document).off("click", "#logoutBtn");
         $(document).on("click", "#logoutBtn", function (e) {
             e.preventDefault();
             UserService.logout();
         });
 
-        // Inicijalno popuni navbar & admin UI
+        /* INIT UI */
         UserService.updateNavbar();
         UserService.applyRoleUI();
 
-        // Godina u footeru (čisto kozmetika)
         const yearEl = document.getElementById("year");
-        if (yearEl) {
-            yearEl.textContent = new Date().getFullYear();
-        }
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
     },
 
+    /* =========================
+       LOGIN VALIDATION
+    ========================= */
+    initLoginValidation: function () {
+        if (!$("#loginForm").length || $("#loginForm").data("validator")) return;
+
+        $("#loginForm").validate({
+            rules: {
+                email: { required: true, email: true },
+                password: { required: true, minlength: 8 }
+            },
+            submitHandler: function (form) {
+                const entity = Object.fromEntries(new FormData(form).entries());
+                UserService.login(entity);
+            }
+        });
+    },
+
+    /* =========================
+       REGISTER VALIDATION
+    ========================= */
+    initRegisterValidation: function () {
+        if (!$("#registerForm").length || $("#registerForm").data("validator")) return;
+
+        $("#registerForm").validate({
+            rules: {
+                name: { required: true, minlength: 2 },
+                email: { required: true, email: true },
+                password: { required: true, minlength: 8 }
+            },
+            submitHandler: function (form) {
+                const entity = Object.fromEntries(new FormData(form).entries());
+                UserService.register(entity);
+            }
+        });
+    },
+
+    /* =========================
+       LOGIN
+    ========================= */
     login: function (entity) {
+        $.blockUI({ message: "<h3>Logging in...</h3>" });
+
         $.ajax({
             url: Constants.PROJECT_BASE_URL + "auth/login",
             type: "POST",
-            data: JSON.stringify(entity),
             contentType: "application/json",
-            dataType: "json",
+            data: JSON.stringify(entity),
             success: function (result) {
-                // backend vraća { message, data: { ...userFields..., token } }
                 localStorage.setItem("user_token", result.data.token);
                 UserService.updateNavbar();
                 UserService.applyRoleUI();
                 window.location.hash = "#home";
             },
             error: function (xhr) {
-                alert(xhr.responseText || "Login error");
+                alert(xhr.responseText || "Login failed");
+            },
+            complete: function () {
+                $.unblockUI();
             }
         });
     },
 
+    /* =========================
+       REGISTER
+    ========================= */
     register: function (entity) {
+        $.blockUI({ message: "<h3>Creating account...</h3>" });
+
         $.ajax({
             url: Constants.PROJECT_BASE_URL + "auth/register",
             type: "POST",
-            data: JSON.stringify(entity),
             contentType: "application/json",
-            dataType: "json",
-            success: function (result) {
-                // Nakon uspješnog registra, možeš ili auto-login ili redirect na login
-                alert("Registration successful. Please log in.");
+            data: JSON.stringify(entity),
+            success: function () {
+                alert("Registration successful. Please login.");
                 window.location.hash = "#login";
             },
             error: function (xhr) {
-                alert(xhr.responseText || "Registration error");
+                alert(xhr.responseText || "Registration failed");
+            },
+            complete: function () {
+                $.unblockUI();
             }
         });
     },
 
+    /* =========================
+       LOGOUT
+    ========================= */
     logout: function () {
         localStorage.removeItem("user_token");
         UserService.updateNavbar();
@@ -78,96 +115,86 @@ var UserService = {
         window.location.hash = "#login";
     },
 
+    /* =========================
+       CURRENT USER
+    ========================= */
     getCurrentUser: function () {
         const token = localStorage.getItem("user_token");
         if (!token) return null;
+
         const payload = Utils.parseJwt(token);
         return payload ? payload.user : null;
     },
 
+    /* =========================
+       NAVBAR
+    ========================= */
     updateNavbar: function () {
-    const $tabs = $("#tabs");
-    if ($tabs.length === 0) return;
+        const $tabs = $("#tabs");
+        if (!$tabs.length) return;
 
-    $tabs.empty();
+        $tabs.empty();
+        const token = localStorage.getItem("user_token");
 
-    const token = localStorage.getItem("user_token");
+        if (!token) {
+            $tabs.append(`
+                <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="#barbers">Barbers</a></li>
+                <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-light me-2" href="#login">Login</a>
+                    <a class="btn btn-light" href="#register">Register</a>
+                </li>
+            `);
+            return;
+        }
 
-    /* ============================
-       GUEST
-    ============================ */
-    if (!token) {
+        const user = UserService.getCurrentUser();
+        if (!user) return;
+
+        if (user.role === Constants.ADMIN_ROLE) {
+            $tabs.append(`
+                <li class="nav-item"><a class="nav-link" href="#dashboard">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="#manage-appointments">Appointments</a></li>
+                <li class="nav-item">
+                    <span class="navbar-text me-2">Admin</span>
+                    <button id="logoutBtn" class="btn btn-outline-light">Logout</button>
+                </li>
+            `);
+            return;
+        }
+
         $tabs.append(`
             <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
             <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
             <li class="nav-item"><a class="nav-link" href="#barbers">Barbers</a></li>
             <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
-            <li class="nav-item d-flex align-items-center">
-                <a class="btn btn-outline-light me-2" href="#login">Login</a>
-                <a class="btn btn-light" href="#register">Register</a>
+            <li class="nav-item"><a class="nav-link" href="#book">Book</a></li>
+            <li class="nav-item"><a class="nav-link" href="#profile">Profile</a></li>
+            <li class="nav-item">
+                <span class="navbar-text me-2">${user.name}</span>
+                <button id="logoutBtn" class="btn btn-outline-light">Logout</button>
             </li>
         `);
-        return;
-    }
+    },
 
-    const user = UserService.getCurrentUser();
-    if (!user) return;
-
-    /* ============================
-       ADMIN
-    ============================ */
-    if (user.role === Constants.ADMIN_ROLE) {
-    $tabs.append(`
-        <li class="nav-item">
-            <a class="nav-link" href="#dashboard">Dashboard</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#manage-barbers">Barbers</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#manage-appointments">Appointments</a>
-        </li>
-        <li class="nav-item d-flex align-items-center">
-            <span class="navbar-text me-2">Admin</span>
-            <button id="logoutBtn" class="btn btn-outline-light">Logout</button>
-        </li>
-    `);
-    return;
-}
-
-
-    /* ============================
-       CUSTOMER
-    ============================ */
-    $tabs.append(`
-        <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-        <li class="nav-item"><a class="nav-link" href="#barbers">Barbers</a></li>
-        <li class="nav-item"><a class="nav-link" href="#reviews">Reviews</a></li>
-        <li class="nav-item"><a class="nav-link" href="#book">Book</a></li>
-        <li class="nav-item"><a class="nav-link" href="#profile">Profile</a></li>
-        <li class="nav-item d-flex align-items-center">
-            <span class="navbar-text me-2">${user.name}</span>
-            <button id="logoutBtn" class="btn btn-outline-light">Logout</button>
-        </li>
-    `);
-}
-
-    ,
-
+    /* =========================
+       ROLE UI
+    ========================= */
     applyRoleUI: function () {
-    const user = UserService.getCurrentUser();
-    if (!user) return; // ⬅ nema redirecta
+        const user = UserService.getCurrentUser();
+        if (!user) {
+            $(".admin-only").addClass("d-none");
+            return;
+        }
 
-    const role = user.role;
-
-    if (role === Constants.ADMIN_ROLE) {
-        $(".admin-only").removeClass("d-none");
-        $("#admin-denied").addClass("d-none");
-    } else {
-        $(".admin-only").addClass("d-none");
-        $("#admin-denied").removeClass("d-none");
+        if (user.role === Constants.ADMIN_ROLE) {
+            $(".admin-only").removeClass("d-none");
+            $("#admin-denied").addClass("d-none");
+        } else {
+            $(".admin-only").addClass("d-none");
+            $("#admin-denied").removeClass("d-none");
+        }
     }
-}
-
 };
