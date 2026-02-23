@@ -6,17 +6,21 @@ var AppointmentService = {
     ========================= */
     initBookingForm: function () {
         AppointmentService.loadBarbers();
+        AppointmentService.setMinimumAppointmentDate();
 
         $("#book-appointment-form").validate({
             rules: {
                 barber_id: { required: true },
                 service_id: { required: true },
-                appointment_date: { required: true }
+                appointment_date: { required: true, minAppointmentDate: true }
             },
             messages: {
                 barber_id: "Please select a barber",
                 service_id: "Please select a service",
-                appointment_date: "Please choose a date"
+                appointment_date: {
+                    required: "Please choose a date",
+                    minAppointmentDate: "Appointment date cannot be in the past"
+                }
             },
             submitHandler: function (form) {
 
@@ -42,6 +46,22 @@ var AppointmentService = {
         $(document).on("click", ".delete-appointment", function () {
             AppointmentService.remove($(this).data("id"));
         });
+    },
+
+    setMinimumAppointmentDate: function () {
+        const now = new Date();
+        const localISOTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16);
+
+        $("input[name='appointment_date']").attr("min", localISOTime);
+
+        if (!$.validator.methods.minAppointmentDate) {
+            $.validator.addMethod("minAppointmentDate", function (value) {
+                if (!value) return true;
+                return new Date(value).getTime() >= Date.now();
+            });
+        }
     },
 
     /* =========================
