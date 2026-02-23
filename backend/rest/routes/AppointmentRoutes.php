@@ -97,7 +97,12 @@ Flight::route('POST /appointment', function(){
     Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
 
     $data = Flight::request()->data->getData();
-    Flight::json(Flight::appointmentService()->insert($data));
+
+    try {
+        Flight::json(Flight::appointmentService()->insert($data));
+    } catch (InvalidArgumentException $e) {
+        Flight::halt(400, $e->getMessage());
+    }
 });
 
 /**
@@ -135,7 +140,12 @@ Flight::route('PUT /appointment/@id', function($id){
     Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
 
     $data = Flight::request()->data->getData();
-    Flight::json(Flight::appointmentService()->update($id, $data));
+
+    try {
+        Flight::json(Flight::appointmentService()->update($id, $data));
+    } catch (InvalidArgumentException $e) {
+        Flight::halt(400, $e->getMessage());
+    }
 });
 
 /**
@@ -170,7 +180,12 @@ Flight::route('PATCH /appointment/@id', function($id){
     Flight::auth_middleware()->authorizeRoles([Roles::ADMIN, Roles::USER]);
 
     $data = Flight::request()->data->getData();
-    Flight::json(Flight::appointmentService()->update($id, $data));
+
+    try {
+        Flight::json(Flight::appointmentService()->update($id, $data));
+    } catch (InvalidArgumentException $e) {
+        Flight::halt(400, $e->getMessage());
+    }
 });
 
 /**
